@@ -5,7 +5,7 @@ use Ratchet\ConnectionInterface;
 use Ratchet\Wamp\WampServerInterface;
 
 
-class Chat implements MessageComponentInterface,WampServerInterface {
+class Chat implements MessageComponentInterface {
     protected $clients;
 
     public function __construct() {
@@ -21,10 +21,9 @@ class Chat implements MessageComponentInterface,WampServerInterface {
 
         foreach ($this->clients as $client) {
 
-            $client->send("Bravo Yohan tu es connecté avec l'ID : {$conn->resourceId}");
+            $client->send("nouvelle connexion : {$conn->resourceId}");
 
         }
-        $this->onCall($conn,$conn->resourceId,"toto",[]);
 
 
     }
@@ -36,9 +35,10 @@ class Chat implements MessageComponentInterface,WampServerInterface {
 
         foreach ($this->clients as $client) {
             if ($from !== $client) {
-                $client->send("Toto send : " . $msg);
-
-
+                $client->send(" send ".$from->resourceId.": " . $msg);
+            }
+            if ($from == $client) {
+                $client->send("Vous avez bien envoyer : " . $msg);
             }
         }
 
@@ -60,20 +60,6 @@ class Chat implements MessageComponentInterface,WampServerInterface {
     }
 
 
-    public function onSubscribe(ConnectionInterface $conn, $topic) {
-        echo "topic: ".$topic;
-    }
-    public function onUnSubscribe(ConnectionInterface $conn, $topic) {}
-
-
-    public function onCall(ConnectionInterface $conn, $id, $topic, array $params) {
-        $conn->callError($id, $topic, 'RPC not supported on this demo');
-        echo "call";
-    }
-
-    public function onPublish(ConnectionInterface $conn, $topic, $event, array $exclude, array $eligible) {
-        $topic->broadcast($event);
-    }
 
 
 }
