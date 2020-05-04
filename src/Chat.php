@@ -53,7 +53,21 @@ class Chat implements MessageComponentInterface
         $data = json_decode($msg);
         switch ($data->command) {
 
+            case "list":
 
+
+                foreach ($this->clients as $client) {
+                    if ($from == $client) {
+                        $returnString = "";
+                        foreach($this->subscriptions as $room){
+                            $returnString = $returnString . $room ;
+                        }
+                        $client->send($returnString);
+
+                    }
+                }
+
+                break;
 
             case "subscribe":
                 $this->subscriptions[$from->resourceId] = $data->channel;
