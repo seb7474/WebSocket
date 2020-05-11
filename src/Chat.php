@@ -62,7 +62,14 @@ class Chat implements MessageComponentInterface
                     if ($from == $client) {
                         $returnString = "";
                         foreach ($this->subscriptions as $room) {
-                            $returnString = $returnString . $room;
+                            $returnTable[] = $room;
+
+                        }
+
+                        $returnTable = array_unique($returnTable);
+
+                        foreach ($returnTable as $roomD){
+                            $returnString = $returnString . " " . $roomD;
                         }
 
                         if ($returnString != "") {
@@ -90,6 +97,7 @@ class Chat implements MessageComponentInterface
                 break;
 
             case "message":
+
                 if (isset($this->subscriptions[$from->resourceId])) {
 
                     $target = $this->subscriptions[$from->resourceId];
@@ -100,16 +108,16 @@ class Chat implements MessageComponentInterface
 
                             if (isset($this->pseudo[$from->resourceId])) {
 
-                                if($this->pseudo[$from->resourceId] != ""){
+                                if ($this->pseudo[$from->resourceId] != "") {
                                     $name = $this->pseudo[$from->resourceId];
-                                }else{
+                                } else {
                                     $name = $from->resourceId;
                                 }
                                 $sendContent = $name . " dit : " . $data->message;
 
                                 $this->users[$id]->send($sendContent);
 
-                            }else{
+                            } else {
 
                                 $name = $from->resourceId;
                                 $sendContent = $name . " dit : " . $data->message;
