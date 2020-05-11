@@ -62,7 +62,13 @@ class Chat implements MessageComponentInterface
                         foreach($this->subscriptions as $room){
                             $returnString = $returnString . $room ;
                         }
-                        $client->send($returnString);
+
+                        if($returnString != ""){
+                            $client->send($returnString);
+                        }
+                        else{
+                            $client->send("Aucune room");
+                        }
 
                     }
                 }
