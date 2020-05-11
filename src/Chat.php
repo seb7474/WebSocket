@@ -11,12 +11,14 @@ class Chat implements MessageComponentInterface
     protected $clients;
     private $subscriptions;
     private $users;
+    private $pseudos;
 
     public function __construct()
     {
         $this->clients = new \SplObjectStorage;
         $this->subscriptions = [];
         $this->users = [];
+        $this->pseudos = [];
     }
 
     public function onOpen(ConnectionInterface $conn)
@@ -42,13 +44,13 @@ class Chat implements MessageComponentInterface
             , $from->resourceId, $msg, $numRecv, $numRecv == 1 ? '' : 's');
 
         /**   foreach ($this->clients as $client) {
-        if ($from !== $client) {
-        $client->send(" send ".$from->resourceId.": " . $msg);
-        }
-        if ($from == $client) {
-        $client->send("Vous avez bien envoyer : " . $msg);
-        }
-        } **/
+         * if ($from !== $client) {
+         * $client->send(" send ".$from->resourceId.": " . $msg);
+         * }
+         * if ($from == $client) {
+         * $client->send("Vous avez bien envoyer : " . $msg);
+         * }
+         * } **/
 
         $data = json_decode($msg);
         switch ($data->command) {
@@ -59,14 +61,13 @@ class Chat implements MessageComponentInterface
                 foreach ($this->clients as $client) {
                     if ($from == $client) {
                         $returnString = "";
-                        foreach($this->subscriptions as $room){
-                            $returnString = $returnString . $room ;
+                        foreach ($this->subscriptions as $room) {
+                            $returnString = $returnString . $room;
                         }
 
-                        if($returnString != ""){
+                        if ($returnString != "") {
                             $client->send($returnString);
-                        }
-                        else{
+                        } else {
                             $client->send("Aucune room");
                         }
 
@@ -77,6 +78,10 @@ class Chat implements MessageComponentInterface
 
             case "subscribe":
                 $this->subscriptions[$from->resourceId] = $data->channel;
+                break;
+
+            case "pseudo":
+                $this->pseudos[$from->resourceId] = $data->pseudo;
                 break;
 
             case "unsubscribe":
@@ -93,8 +98,25 @@ class Chat implements MessageComponentInterface
 
                         if ($channel == $target && $id != $from->resourceId) {
 
-                            $this->users[$id]->send($data->message);
+                            if (isset($this->pseudo[$from->resourceId])) {
 
+                                if($this->pseudo[$from->resourceId] != ""){
+                                    $name = $this->pseudo[$from->resourceId];
+                                }else{
+                                    $name = $from->resourceId;
+                                }
+                                $sendContent = $name . " dit : " . $data->message;
+
+                                $this->users[$id]->send($sendContent);
+
+                            }else{
+
+                                $name = $from->resourceId;
+                                $sendContent = $name . " dit : " . $data->message;
+                                $this->users[$id]->send($sendContent);
+
+
+                            }
                         }
                     }
                 }

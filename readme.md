@@ -11,5 +11,5 @@
 - To send a message : `{"command":"message","message":"testMessage"}`  
 - To create or enter in a room : `{"command":"subscribe","channel":"nomDelaRoom"}`  
 - To display the room list : `{"command":"list"}`
+- To choose a pseudo : `{"command":"pseudo","pseudo":"testPseudo"}`
 
-Don't use the "unsubscribe" command for the moment : `{"command":"unsubscribe","channel":"nomDelaRoom"}`
