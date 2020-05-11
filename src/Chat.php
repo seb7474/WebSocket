@@ -137,15 +137,37 @@ class Chat implements MessageComponentInterface
 
             case "subscribe":
                 $this->subscriptions[$from->resourceId] = $data->channel;
+                foreach ($this->clients as $client) {
+                    if ($from == $client) {
+
+                        $client->send("Vous avez rejoint la room : ".$data->channel);
+
+                    }
+                }
                 break;
 
             case "pseudo":
 
                 $this->pseudos[$from->resourceId] = $data->pseudo;
+                foreach ($this->clients as $client) {
+                    if ($from == $client) {
+
+                        $client->send("Votre pseudo est maintenant : ".$data->pseudo);
+
+                    }
+                }
                 break;
 
             case "unsubscribe":
+                $room = $this->subscriptions[$from->resourceId];
                 unset($this->subscriptions[$from->resourceId]);
+                foreach ($this->clients as $client) {
+                    if ($from == $client) {
+
+                        $client->send("Vous avez quitté : ". $room);
+
+                    }
+                }
                 break;
 
             case "message":
@@ -176,6 +198,8 @@ class Chat implements MessageComponentInterface
 
 
                             }
+                        }elseif ($id == $from->resourceId){
+                            $this->users[$id]->send("message envoyé");
                         }
                     }
                 }
