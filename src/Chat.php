@@ -68,7 +68,7 @@ class Chat implements MessageComponentInterface
 
                         $returnTable = array_unique($returnTable);
 
-                        foreach ($returnTable as $roomD){
+                        foreach ($returnTable as $roomD) {
                             $returnString = $returnString . " " . $roomD;
                         }
 
@@ -82,12 +82,65 @@ class Chat implements MessageComponentInterface
                 }
 
                 break;
+            case "roomPlayers":
+
+                if (isset($this->subscriptions[$from->resourceId])) {
+
+                    $target = $this->subscriptions[$from->resourceId];
+                    $returnNameTable=[];
+
+                    foreach ($this->subscriptions as $id => $channel) {
+
+                        if ($channel == $target) {
+
+
+                            if (isset($this->pseudos[$id])) {
+
+                                if ($this->pseudos[$id] != "") {
+                                    $name = $this->pseudos[$id];
+                                } else {
+                                    $name = $id;
+                                }
+
+                            } else {
+                                $name = $id;
+                            }
+
+
+                            $returnNameTable[] = $name;
+
+
+                        }
+                    }
+
+                    $returnNameTable = array_unique($returnNameTable);
+                    $returnStringNames = "";
+
+                    foreach ( $returnNameTable as $playerName){
+                        $returnStringNames =  $returnStringNames . " " . $playerName;
+                    }
+
+
+                    foreach ($this->clients as $client) {
+                        if ($from == $client) {
+
+                                $client->send($returnStringNames);
+
+                        }
+                    }
+
+
+                }
+
+
+                break;
 
             case "subscribe":
                 $this->subscriptions[$from->resourceId] = $data->channel;
                 break;
 
             case "pseudo":
+
                 $this->pseudos[$from->resourceId] = $data->pseudo;
                 break;
 
@@ -96,7 +149,6 @@ class Chat implements MessageComponentInterface
                 break;
 
             case "message":
-
                 if (isset($this->subscriptions[$from->resourceId])) {
 
                     $target = $this->subscriptions[$from->resourceId];
@@ -105,10 +157,10 @@ class Chat implements MessageComponentInterface
 
                         if ($channel == $target && $id != $from->resourceId) {
 
-                            if (isset($this->pseudo[$from->resourceId])) {
+                            if (isset($this->pseudos[$from->resourceId])) {
 
-                                if ($this->pseudo[$from->resourceId] != "") {
-                                    $name = $this->pseudo[$from->resourceId];
+                                if ($this->pseudos[$from->resourceId] != "") {
+                                    $name = $this->pseudos[$from->resourceId];
                                 } else {
                                     $name = $from->resourceId;
                                 }
