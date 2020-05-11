@@ -92,7 +92,6 @@ class Chat implements MessageComponentInterface
                 break;
 
             case "unsubscribe":
-                unset($this->users[$from->resourceId]);
                 unset($this->subscriptions[$from->resourceId]);
                 break;
 
